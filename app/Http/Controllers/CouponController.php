@@ -2,64 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Coupon;
+use App\Http\Controllers\Controller;
+use App\Services\CouponService;
 use Illuminate\Http\Request;
 
-class CouponController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class CouponController extends Controller {
+    private $couponService;
+
+    public function __construct(CouponService $couponService) {
+        $this->couponService = $couponService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->couponService->getAllCoupons());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->couponService->getCouponById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Coupon $coupon)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'code' => 'required|string|unique:coupons,code',
+            'discount' => 'required|numeric|min:0',
+            'expires_at' => 'nullable|date'
+        ]);
+        return response()->json($this->couponService->createCoupon($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Coupon $coupon)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate([
+            'code' => 'sometimes|string|unique:coupons,code,' . $id,
+            'discount' => 'sometimes|numeric|min:0',
+            'expires_at' => 'sometimes|date'
+        ]);
+        return response()->json(['success' => $this->couponService->updateCoupon($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Coupon $coupon)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Coupon $coupon)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->couponService->deleteCoupon($id)]);
     }
 }

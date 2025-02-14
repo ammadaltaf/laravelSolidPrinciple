@@ -2,64 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Wishlist;
+use App\Http\Controllers\Controller;
+use App\Services\WishlistService;
 use Illuminate\Http\Request;
 
-class WishlistController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class WishlistController extends Controller {
+    private $wishlistService;
+
+    public function __construct(WishlistService $wishlistService) {
+        $this->wishlistService = $wishlistService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->wishlistService->getAllWishlists());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->wishlistService->getWishlistById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Wishlist $wishlist)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id'
+        ]);
+        return response()->json($this->wishlistService->createWishlist($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Wishlist $wishlist)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Wishlist $wishlist)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Wishlist $wishlist)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->wishlistService->deleteWishlist($id)]);
     }
 }

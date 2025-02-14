@@ -2,64 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
+use App\Http\Controllers\Controller;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class OrderController extends Controller {
+    private $orderService;
+
+    public function __construct(OrderService $orderService) {
+        $this->orderService = $orderService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->orderService->getAllOrders());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->orderService->getOrderById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Order $order)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'total_price' => 'required|numeric',
+            'status' => 'required|string|max:255'
+        ]);
+        return response()->json($this->orderService->createOrder($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate([
+            'status' => 'sometimes|string|max:255'
+        ]);
+        return response()->json(['success' => $this->orderService->updateOrder($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Order $order)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->orderService->deleteOrder($id)]);
     }
 }

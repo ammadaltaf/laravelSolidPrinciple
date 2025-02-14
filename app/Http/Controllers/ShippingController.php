@@ -2,64 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Shipping;
+use App\Http\Controllers\Controller;
+use App\Services\ShippingService;
 use Illuminate\Http\Request;
 
-class ShippingController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class ShippingController extends Controller {
+    private $shippingService;
+
+    public function __construct(ShippingService $shippingService) {
+        $this->shippingService = $shippingService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->shippingService->getAllShippings());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->shippingService->getShippingById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Shipping $shipping)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'tracking_number' => 'required|string|unique:shippings,tracking_number',
+            'status' => 'required|string',
+            'estimated_delivery' => 'nullable|date'
+        ]);
+        return response()->json($this->shippingService->createShipping($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Shipping $shipping)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate([
+            'status' => 'sometimes|string',
+            'estimated_delivery' => 'sometimes|date'
+        ]);
+        return response()->json(['success' => $this->shippingService->updateShipping($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Shipping $shipping)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Shipping $shipping)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->shippingService->deleteShipping($id)]);
     }
 }

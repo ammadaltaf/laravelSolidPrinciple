@@ -2,64 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Notification;
+use App\Http\Controllers\Controller;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
-class NotificationController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class NotificationController extends Controller {
+    private $notificationService;
+
+    public function __construct(NotificationService $notificationService) {
+        $this->notificationService = $notificationService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->notificationService->getAllNotifications());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->notificationService->getNotificationById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Notification $notification)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'message' => 'required|string',
+            'type' => 'required|string',
+            'status' => 'required|string',
+        ]);
+        return response()->json($this->notificationService->createNotification($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Notification $notification)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate([
+            'message' => 'sometimes|string',
+            'type' => 'sometimes|string',
+            'status' => 'sometimes|string',
+        ]);
+        return response()->json(['success' => $this->notificationService->updateNotification($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Notification $notification)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Notification $notification)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->notificationService->deleteNotification($id)]);
     }
 }

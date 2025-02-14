@@ -2,64 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaction;
+use App\Http\Controllers\Controller;
+use App\Services\TransactionService;
 use Illuminate\Http\Request;
 
-class TransactionController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class TransactionController extends Controller {
+    private $transactionService;
+
+    public function __construct(TransactionService $transactionService) {
+        $this->transactionService = $transactionService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->transactionService->getAllTransactions());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->transactionService->getTransactionById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Transaction $transaction)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'payment_id' => 'required|exists:payments,id',
+            'amount' => 'required|numeric|min:0',
+            'status' => 'required|string'
+        ]);
+        return response()->json($this->transactionService->createTransaction($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Transaction $transaction)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate([
+            'status' => 'sometimes|string',
+            'amount' => 'sometimes|numeric|min:0'
+        ]);
+        return response()->json(['success' => $this->transactionService->updateTransaction($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Transaction $transaction)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Transaction $transaction)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->transactionService->deleteTransaction($id)]);
     }
 }

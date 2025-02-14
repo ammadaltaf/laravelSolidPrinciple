@@ -2,64 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
+use App\Http\Controllers\Controller;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 
-class PaymentController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class PaymentController extends Controller {
+    private $paymentService;
+
+    public function __construct(PaymentService $paymentService) {
+        $this->paymentService = $paymentService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->paymentService->getAllPayments());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->paymentService->getPaymentById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Payment $payment)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'payment_method' => 'required|string',
+            'amount' => 'required|numeric',
+            'status' => 'required|string'
+        ]);
+        return response()->json($this->paymentService->createPayment($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Payment $payment)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate([
+            'status' => 'sometimes|string'
+        ]);
+        return response()->json(['success' => $this->paymentService->updatePayment($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Payment $payment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Payment $payment)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->paymentService->deletePayment($id)]);
     }
 }

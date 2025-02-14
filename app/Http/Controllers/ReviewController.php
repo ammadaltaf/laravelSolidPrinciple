@@ -2,64 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Review;
+use App\Http\Controllers\Controller;
+use App\Services\ReviewService;
 use Illuminate\Http\Request;
 
-class ReviewController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class ReviewController extends Controller {
+    private $reviewService;
+
+    public function __construct(ReviewService $reviewService) {
+        $this->reviewService = $reviewService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->reviewService->getAllReviews());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->reviewService->getReviewById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Review $review)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string'
+        ]);
+        return response()->json($this->reviewService->createReview($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Review $review)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate([
+            'rating' => 'sometimes|integer|min:1|max:5',
+            'comment' => 'sometimes|string'
+        ]);
+        return response()->json(['success' => $this->reviewService->updateReview($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Review $review)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Review $review)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->reviewService->deleteReview($id)]);
     }
 }

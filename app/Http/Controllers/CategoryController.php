@@ -2,64 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Http\Controllers\Controller;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class CategoryController extends Controller {
+    private $categoryService;
+
+    public function __construct(CategoryService $categoryService) {
+        $this->categoryService = $categoryService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->categoryService->getAllCategories());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->categoryService->getCategoryById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate(['name' => 'required|string|max:255']);
+        return response()->json($this->categoryService->createCategory($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate(['name' => 'sometimes|string|max:255']);
+        return response()->json(['success' => $this->categoryService->updateCategory($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->categoryService->deleteCategory($id)]);
     }
 }

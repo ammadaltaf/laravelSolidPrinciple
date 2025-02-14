@@ -2,64 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
+use App\Http\Controllers\Controller;
+use App\Services\CartService;
 use Illuminate\Http\Request;
 
-class CartController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+class CartController extends Controller {
+    private $cartService;
+
+    public function __construct(CartService $cartService) {
+        $this->cartService = $cartService;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function index() {
+        return response()->json($this->cartService->getAllCarts());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show(int $id) {
+        return response()->json($this->cartService->getCartById($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Cart $cart)
-    {
-        //
+    public function store(Request $request) {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer'
+        ]);
+        return response()->json($this->cartService->createCart($data), 201);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Cart $cart)
-    {
-        //
+    public function update(Request $request, int $id) {
+        $data = $request->validate([
+            'quantity' => 'sometimes|integer'
+        ]);
+        return response()->json(['success' => $this->cartService->updateCart($id, $data)]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Cart $cart)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Cart $cart)
-    {
-        //
+    public function destroy(int $id) {
+        return response()->json(['success' => $this->cartService->deleteCart($id)]);
     }
 }
