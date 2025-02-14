@@ -2,6 +2,11 @@
 @section('title', 'Category List')
 @section('content')
 <div class="container">
+    @if (session('message'))
+    <div class="alert alert-success">
+        {{ session('message') }}
+    </div>
+    @endif
     <a href="{{ route('categories.create') }}" class="btn btn-primary mb-3">Add Category</a>
     <table class="table table-bordered">
         <thead>

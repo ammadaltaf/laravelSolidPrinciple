@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\Product;
+use App\Models\Category;
 
 class ProductService {
     private ProductRepositoryInterface $productRepository;
@@ -15,7 +16,9 @@ class ProductService {
     public function getAllProducts(): Collection {
         return $this->productRepository->all();
     }
-
+    public function getAllCategories() {
+        return Category::all(); 
+    }
     public function getProductById(int $id): ?Product {
         return $this->productRepository->findById($id);
     }

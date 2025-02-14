@@ -29,8 +29,8 @@
             <label>Stock:</label>
             <input type="number" name="stock" class="form-control" value="{{ old('stock', $product->stock ?? '') }}" required>
         </div>
-        <button type="submit" class="btn btn-success">Save</button>
-        <a href="{{ route('products.index') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-success mt-2">Save</button>
+        <a href="{{ route('products.index') }}" class="btn btn-secondary mt-2">Cancel</a>
     </form>
 </div>
 @endsection

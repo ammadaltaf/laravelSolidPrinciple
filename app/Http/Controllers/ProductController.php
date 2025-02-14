@@ -13,9 +13,14 @@ class ProductController extends Controller {
     }
 
     public function index(){
-        return response()->json($this->productService->getAllProducts());
+        $products = $this->productService->getAllProducts();
+        return view('product.index',compact('products'));
     }
-
+    public function create() {
+        $categories = $this->productService->getAllCategories(); // Fetch categories
+        return view('product.form', compact('categories'));
+    }
+    
     public function show(int $id) {
         return response()->json($this->productService->getProductById($id));
     }

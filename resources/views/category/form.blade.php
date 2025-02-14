@@ -11,8 +11,12 @@
             <label>Name:</label>
             <input type="text" name="name" class="form-control" value="{{ old('name', $category->name ?? '') }}" required>
         </div>
-        <button type="submit" class="btn btn-success">Save</button>
-        <a href="{{ route('categories.index') }}" class="btn btn-secondary">Cancel</a>
+        <div class="form-group">
+            <label>Description:</label>
+            <input type="text" name="description" class="form-control" value="{{ old('description', $category->description ?? '') }}" required>
+        </div>
+        <button type="submit" class="btn btn-success mt-2">Save</button>
+        <a href="{{ route('categories.index') }}" class="btn btn-secondary mt-2">Cancel</a>
     </form>
 </div>
 @endsection

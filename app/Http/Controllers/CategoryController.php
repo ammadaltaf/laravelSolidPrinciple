@@ -14,21 +14,29 @@ class CategoryController extends Controller {
     }
 
     public function index() {
-        return response()->json($this->categoryService->getAllCategories());
+        $categories = $this->categoryService->getAllCategories();
+        return view('category.index',compact('categories'));
     }
 
-    public function show(int $id) {
-        return response()->json($this->categoryService->getCategoryById($id));
+    public function create() {
+        return view('category.form');
+    }
+
+    public function edit(int $id) {
+        $category = $this->categoryService->getCategoryById($id);
+        return view('category.form',compact('category'));
     }
 
     public function store(Request $request) {
-        $data = $request->validate(['name' => 'required|string|max:255']);
-        return response()->json($this->categoryService->createCategory($data), 201);
+        $data = $request->validate(['name' => 'required|string|max:255','description'=>'required']);
+        $this->categoryService->createCategory($data);
+        return redirect()->route('categories.index')->with(['message'=>'Category added successfully']);
     }
 
     public function update(Request $request, int $id) {
         $data = $request->validate(['name' => 'sometimes|string|max:255']);
-        return response()->json(['success' => $this->categoryService->updateCategory($id, $data)]);
+        $this->categoryService->updateCategory($id, $data);
+        return redirect()->route('categories.index')->with(['message'=>'Category updated successfully']);
     }
 
     public function destroy(int $id) {

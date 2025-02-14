@@ -52,7 +52,7 @@
         <h4>Reviews</h4>
         <a href="{{ route('reviews.index') }}">Reviews</a>
         <h4>Wishlist</h4>
-        <a href="{{ route('wishlist.index') }}">Wishlist</a>
+        <a href="{{ route('wishlists.index') }}">Wishlist</a>
         <h4>Coupons</h4>
         <a href="{{ route('coupons.index') }}">Coupons</a>
         <h4>Transactions</h4>
